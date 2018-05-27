@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.Math;
 
 public class MainActivity extends Activity {
 
@@ -91,5 +92,43 @@ public class MainActivity extends Activity {
         }
 
         return stringBuilder.toString();
+    }
+
+    public int getOptimalAngle(int firstRssi, int secondRssi, int thirdRssi,
+                               int firstAngle, int secondAngle) {
+
+        int angle = 180 - (secondAngle - firstAngle);
+
+        double sinAngle = Math.sin(Math.toRadians(angle));
+        double cosAngle = Math.cos(Math.toRadians(angle));
+
+        int AD = secondRssi - firstRssi;
+        int AB = thirdRssi - secondRssi;
+
+        int transposeAngle = getTransposeAngle(AD, AB);
+
+        AD = Math.abs(AD);
+        AB = Math.abs(AB);
+
+        int optimalAngle = (int) ((90 - angle) + Math.atan(Math.toRadians((AD - AB * cosAngle) / (AB * sinAngle))));
+
+        int transposedOptimalAngle = optimalAngle + transposeAngle;
+
+        int mapToCompassAngle = secondAngle - transposedOptimalAngle;
+
+        return mapToCompassAngle;
+    }
+
+    private int getTransposeAngle(double AD, double AB) {
+        int transposeAngle = 0;
+
+        if (AD >= 0) {
+            if (AB < 0) {
+                transposeAngle = 90;
+            }
+        } else {
+            transposeAngle = AB >= 0 ? -90 : -180;
+        }
+        return transposeAngle;
     }
 }
