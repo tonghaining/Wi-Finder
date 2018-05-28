@@ -26,6 +26,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import java.lang.Math;
+
 public class MainActivity extends Activity {
 
     private static final int NUMBER_OF_ITERATIONS = 3;
@@ -144,4 +146,42 @@ public class MainActivity extends Activity {
         currentAngleTextView = findViewById(R.id.current_angle_textview);
     }
 
+
+    public int getOptimalAngle(int firstRssi, int secondRssi, int thirdRssi,
+                               int firstAngle, int secondAngle) {
+
+        int angle = 180 - (secondAngle - firstAngle);
+
+        double sinAngle = Math.sin(Math.toRadians(angle));
+        double cosAngle = Math.cos(Math.toRadians(angle));
+
+        int AD = secondRssi - firstRssi;
+        int AB = thirdRssi - secondRssi;
+
+        int transposeAngle = getTransposeAngle(AD, AB);
+
+        AD = Math.abs(AD);
+        AB = Math.abs(AB);
+
+        int optimalAngle = (int) ((90 - angle) + Math.atan(Math.toRadians((AD - AB * cosAngle) / (AB * sinAngle))));
+
+        int transposedOptimalAngle = optimalAngle + transposeAngle;
+
+        int mapToCompassAngle = secondAngle - transposedOptimalAngle;
+
+        return mapToCompassAngle;
+    }
+
+    private int getTransposeAngle(double AD, double AB) {
+        int transposeAngle = 0;
+
+        if (AD >= 0) {
+            if (AB < 0) {
+                transposeAngle = 90;
+            }
+        } else {
+            transposeAngle = AB >= 0 ? -90 : -180;
+        }
+        return transposeAngle;
+    }
 }
