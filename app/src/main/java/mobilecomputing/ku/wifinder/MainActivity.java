@@ -44,7 +44,11 @@ public class MainActivity extends Activity {
 
     private TextView iterationsDataTextView;
 
+    private TextView currentAngleTextView;
+
     private List<Integer> collectedData = new ArrayList<>();
+
+    private Compass compass;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,6 +75,8 @@ public class MainActivity extends Activity {
 
 //            iterationsDataTextView.setText(getIterationsDataString());
         });
+
+        setupCompass();
 
     }
 
@@ -119,6 +125,27 @@ public class MainActivity extends Activity {
 
         return stringBuilder.toString();
     }
+
+    private void setupCompass() {
+        compass = new Compass(this);
+        compass.setListener((float azimuth) ->
+            currentAngleTextView.setText(getString(R.string.current_angle, azimuth))
+        );
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        compass.stop();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        compass.start();
+        currentAngleTextView = findViewById(R.id.current_angle_textview);
+    }
+
 
     public int getOptimalAngle(int firstRssi, int secondRssi, int thirdRssi,
                                int firstAngle, int secondAngle) {
