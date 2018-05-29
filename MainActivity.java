@@ -141,11 +141,46 @@ public class MainActivity extends Activity {
         int correctAng = getTransposeAngle(fst, snd, optimalAngle);
 
         int mapToCompassAngle = secondAngle - correctAng;
+
         if (firstAngle >= secondAngle){
             mapToCompassAngle = 540 - mapToCompassAngle;
         }
-        return mapToCompassAngle;
+
+
+        if (Math.abs(firstAngle - secondAngle) > 180){
+            mapToCompassAngle += 180;
+        }
+
+        return (mapToCompassAngle % 360);
     }
+
+//    public int getOptimalAngle(int firstRssi, int secondRssi, int thirdRssi,
+//                               int firstAngle, int secondAngle) {
+//
+//        int angle = 180 - (secondAngle - firstAngle);
+//
+//        double sinAngle = Math.sin(Math.toRadians(angle));
+//        double cosAngle = Math.cos(Math.toRadians(angle));
+//
+//        int AD = secondRssi - firstRssi;
+//        int AB = thirdRssi - secondRssi;
+//
+//        double fst = AD;
+//        double snd = AB;
+//
+//        AD = Math.abs(AD);
+//        AB = Math.abs(AB);
+//
+//        int optimalAngle = (int) ((90 - angle) + Math.atan(Math.toRadians((AD - AB * cosAngle) / (AB * sinAngle))));
+//
+//        int correctAng = getTransposeAngle(fst, snd, optimalAngle);
+//
+//        int mapToCompassAngle = secondAngle - correctAng;
+//
+//
+//
+//        return mapToCompassAngle;
+//    }
 
     private int getTransposeAngle(double AD, double AB, int ang) {
         int correctAng = ang;

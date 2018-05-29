@@ -37,6 +37,10 @@ public class ExampleUnitTest {
         Assert.assertEquals(result3, 180);
         int result4 = activity.getOptimalAngle(0,5,15,270,150);
         Assert.assertEquals(result4, 180);
+        int result5 = activity.getOptimalAngle(0,5,15,30,270);
+        Assert.assertEquals(result5, 300);
+        int result6 = activity.getOptimalAngle(0,1732,3732,270,30);
+        Assert.assertEquals(result6, 0);
     }
 
     @Test
