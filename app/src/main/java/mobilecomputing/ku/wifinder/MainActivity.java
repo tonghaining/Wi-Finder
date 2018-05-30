@@ -179,6 +179,7 @@ public class MainActivity extends Activity {
         AB = Math.abs(AB);
 
         int optimalAngle = (int) ((90 - angle) + Math.atan(Math.toRadians((AD - AB * cosAngle) / (AB * sinAngle))));
+        optimalAngle = Math.abs(optimalAngle);
 
         if (isRightTurn) {
             optimalAngle = - optimalAngle;
@@ -189,6 +190,7 @@ public class MainActivity extends Activity {
 
         //map to compass angle
         return (secondAngleMapped + transposeAngle + optimalAngle + compensateAngleOffset) % 360;
+        //return (secondAngle + transposeAngle + optimalAngle) % 360;
     }
 
     private int getTransposeAngle(int AD, int AB, boolean isRightTurn) {

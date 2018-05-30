@@ -16,11 +16,6 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
 
     @Test
-    public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
-    }
-
-    @Test
     public void getOptimalAngle_basicTest(){
         MainActivity activity = new MainActivity();
 
@@ -85,4 +80,59 @@ public class ExampleUnitTest {
         Assert.assertEquals(qudrant_four, 300);
     }
 
+    @Test
+    public void getOptimalAngle_obtuseAngles_turnRight(){
+        MainActivity activity = new MainActivity();
+
+        //Turn right
+        int result1 = activity.getOptimalAngle(6,10,17,300,340);
+        Assert.assertEquals(result1, 291);
+        int result2 = activity.getOptimalAngle(10,6,17,300,340);
+        Assert.assertEquals(result2, 21);
+        int result3 = activity.getOptimalAngle(6,17,10,300,340);
+        Assert.assertEquals(result3, 201);
+        int result4 = activity.getOptimalAngle(17,10,6,300,340);
+        Assert.assertEquals(result4, 111);
+    }
+
+    @Test
+    public void getOptimalAngle_obtuseAngles_turnLeft(){
+        MainActivity activity = new MainActivity();
+
+        //Turn left
+        int result1 = activity.getOptimalAngle(6,10,17,340,300);
+        Assert.assertEquals(result1, 349);
+        int result2 = activity.getOptimalAngle(10,6,17,340,300);
+        Assert.assertEquals(result2, 259);
+        int result3 = activity.getOptimalAngle(6,17,10,340,300);
+        Assert.assertEquals(result3, 79);
+        int result4 = activity.getOptimalAngle(17,10,6,340,300);
+        Assert.assertEquals(result4, 169);
+    }
+    
+    @Test
+    public void getOptimalAngle_endToEnd(){
+        MainActivity activity = new MainActivity();
+
+        // Initial Rssi
+        int s1 = 6;
+        int s2 = 17;
+        int s3 = 10;
+
+        // Initial angles
+        int a1 = 210;
+        int a2 = 50;
+
+        int firstIterationOptimalAngle = activity.getOptimalAngle(s1, s2, s3, a1, a2);
+        Assert.assertEquals(firstIterationOptimalAngle, 210);
+
+        int s4 = 15;
+
+        int secondIterationOptimalAngle = activity.getOptimalAngle(s2, s3, s4, a2, firstIterationOptimalAngle);
+        Assert.assertEquals(secondIterationOptimalAngle, 230);
+
+        int s5 = 17;
+        int thirdIterationOptimalAngle = activity.getOptimalAngle(s3, s4, s5, firstIterationOptimalAngle, secondIterationOptimalAngle);
+        Assert.assertEquals(thirdIterationOptimalAngle, 161);
+    }
 }
