@@ -123,7 +123,22 @@ public class MainActivity extends Activity {
     public int getOptimalAngle(int firstRssi, int secondRssi, int thirdRssi,
                                int firstAngle, int secondAngle) {
 
-        int angle = 180 - (secondAngle - firstAngle);
+        int angle;
+        boolean isRightTurn = true;
+        int angleOffset = (540 - firstAngle) % 360;
+
+        //map to 180
+        int firstAngleMapped = (firstAngle + angleOffset) % 360; // = 180
+        int secondAngleMapped = (secondAngle + angleOffset) % 360;
+
+        if (secondAngleMapped > firstAngleMapped) {
+            // User turned right
+            angle = 360 - secondAngleMapped;
+        } else {
+            // User turned left
+            angle = secondAngleMapped;
+            isRightTurn = false;
+        }
 
         double sinAngle = Math.sin(Math.toRadians(angle));
         double cosAngle = Math.cos(Math.toRadians(angle));
@@ -131,29 +146,48 @@ public class MainActivity extends Activity {
         int AD = secondRssi - firstRssi;
         int AB = thirdRssi - secondRssi;
 
-        int transposeAngle = getTransposeAngle(AD, AB);
+        int transposeAngle = getTransposeAngle(AD, AB, isRightTurn);
 
         AD = Math.abs(AD);
         AB = Math.abs(AB);
 
         int optimalAngle = (int) ((90 - angle) + Math.atan(Math.toRadians((AD - AB * cosAngle) / (AB * sinAngle))));
 
-        int transposedOptimalAngle = optimalAngle + transposeAngle;
+        if (isRightTurn) {
+            optimalAngle = - optimalAngle;
+        }
 
-        int mapToCompassAngle = secondAngle - transposedOptimalAngle;
+        // map back the secondAngleMapped to the initial position
+        int compensateAngleOffset = 360 - angleOffset;
 
-        return mapToCompassAngle;
+        //map to compass angle
+        return (secondAngleMapped + transposeAngle + optimalAngle + compensateAngleOffset) % 360;
     }
 
-    private int getTransposeAngle(double AD, double AB) {
+    private int getTransposeAngle(int AD, int AB, boolean isRightTurn) {
+        if (isRightTurn) {
+            return getRightTransposeAngle(AD, AB);
+        }
+        return  getLeftTransposeAngle(AD, AB);
+    }
+
+    private int getLeftTransposeAngle(double AD, double AB) {
+        int transposeAngle = getRightTransposeAngle(AD, AB);
+        if (transposeAngle == 180) {
+            return transposeAngle;
+        }
+        return -transposeAngle;
+    }
+
+    private int getRightTransposeAngle(double AD, double AB) {
         int transposeAngle = 0;
 
         if (AD >= 0) {
             if (AB < 0) {
-                transposeAngle = 90;
+                transposeAngle = -90;
             }
         } else {
-            transposeAngle = AB >= 0 ? -90 : -180;
+            transposeAngle = AB >= 0 ? 90 : 180;
         }
         return transposeAngle;
     }
