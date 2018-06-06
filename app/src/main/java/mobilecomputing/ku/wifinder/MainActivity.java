@@ -50,6 +50,12 @@ public class MainActivity extends Activity {
 
     private Compass compass;
 
+    private int iterCount;
+
+    private List<Integer> angleList;
+
+    private List<Integer> signalList;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,6 +152,32 @@ public class MainActivity extends Activity {
         currentAngleTextView = findViewById(R.id.current_angle_textview);
     }
 
+    public void init(){
+        this.iterCount = 0;
+        this.angleList =  new ArrayList<Integer>();
+        this.signalList = new ArrayList<Integer>();
+    }
+
+    public int iteration(int angle, int signal) {
+        this.iterCount ++;
+        this.angleList.add(angle);
+        this.signalList.add(signal);
+        if (this.iterCount >= 3) {
+            Integer[] angles = new Integer[this.angleList.size()];
+            angles = this.angleList.toArray(angles);
+            Integer[] signals = new Integer[this.signalList.size()];
+            signals = this.signalList.toArray(signals);
+            int firstRssi = signals[signals.length-3];
+            int secondRssi = signals[signals.length-2];
+            int thirdRssi = signals[signals.length-1];
+            int firstAngle = angles[angles.length-3];
+            int secondAngle = angles[angles.length-2];
+            int opt = this.getOptimalAngle(firstRssi, secondRssi, thirdRssi, firstAngle, secondAngle);
+            return opt;
+        } else{
+            return -1;
+        }
+    }
 
     public int getOptimalAngle(int firstRssi, int secondRssi, int thirdRssi,
                                int firstAngle, int secondAngle) {

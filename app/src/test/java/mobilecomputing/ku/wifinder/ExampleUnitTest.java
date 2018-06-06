@@ -135,4 +135,23 @@ public class ExampleUnitTest {
         int thirdIterationOptimalAngle = activity.getOptimalAngle(s3, s4, s5, firstIterationOptimalAngle, secondIterationOptimalAngle);
         Assert.assertEquals(thirdIterationOptimalAngle, 161);
     }
+
+    @Test
+    public void testIter(){
+        MainActivity activity = new MainActivity();
+
+        activity.init();
+        int opt1 = activity.iteration(210,6);
+        Assert.assertEquals(-1, opt1);
+
+        int opt2 = activity.iteration(50,10);
+        Assert.assertEquals(-1, opt2);
+
+        int opt3 = activity.iteration(100,17);
+        Assert.assertEquals(119, opt3);
+
+        int opt4 = activity.iteration(opt3,7);
+        Assert.assertEquals(331, opt4);
+
+    }
 }
