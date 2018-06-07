@@ -141,17 +141,19 @@ public class ExampleUnitTest {
         MainActivity activity = new MainActivity();
 
         activity.init();
-        int opt1 = activity.iteration(210,6);
+        int opt1 = activity.iteration(6, 210);
         Assert.assertEquals(-1, opt1);
 
-        int opt2 = activity.iteration(50,10);
+        int opt2 = activity.iteration(10, null);
         Assert.assertEquals(-1, opt2);
 
-        int opt3 = activity.iteration(100,17);
+        int opt3 = activity.iteration(17, 50);
         Assert.assertEquals(119, opt3);
 
-        int opt4 = activity.iteration(opt3,7);
-        Assert.assertEquals(331, opt4);
+        int opt4 = activity.iteration(7, opt3);
+        Assert.assertEquals(9, opt4);
 
+        int opt5 = activity.iteration(18, opt4);
+        Assert.assertEquals(299, opt5);
     }
 }

@@ -162,10 +162,15 @@ public class MainActivity extends Activity {
         this.signalList = new ArrayList<Integer>();
     }
 
-    public int iteration(int angle, int signal) {
+    public int iteration(int signal, Integer angle) {
         this.iterCount ++;
-        this.angleList.add(angle);
         this.signalList.add(signal);
+
+        if (angle == null) {
+            return -1;
+        }
+        this.angleList.add(angle);
+
         if (this.iterCount >= 3) {
             Integer[] angles = new Integer[this.angleList.size()];
             angles = this.angleList.toArray(angles);
@@ -174,13 +179,11 @@ public class MainActivity extends Activity {
             int firstRssi = signals[signals.length-3];
             int secondRssi = signals[signals.length-2];
             int thirdRssi = signals[signals.length-1];
-            int firstAngle = angles[angles.length-3];
-            int secondAngle = angles[angles.length-2];
+            int firstAngle = angles[angles.length-2];
+            int secondAngle = angles[angles.length-1];
             int opt = this.getOptimalAngle(firstRssi, secondRssi, thirdRssi, firstAngle, secondAngle);
-            bestAngleTextView.setText(getString(R.string.best_angle, (int) opt));
             return opt;
         } else{
-            bestAngleTextView.setText(getString(R.string.best_angle_placeholder, 3 - iterCount));
             return -1;
         }
     }
