@@ -46,6 +46,8 @@ public class MainActivity extends Activity {
 
     private TextView currentAngleTextView;
 
+    private TextView bestAngleTextView;
+
     private List<Integer> collectedData = new ArrayList<>();
 
     private Compass compass;
@@ -149,6 +151,8 @@ public class MainActivity extends Activity {
     protected void onStart() {
         super.onStart();
         compass.start();
+        bestAngleTextView = findViewById(R.id.current_best_angle_textview);
+        bestAngleTextView.setText(getString(R.string.best_angle_placeholder, 3 - iterCount));
         currentAngleTextView = findViewById(R.id.current_angle_textview);
     }
 
@@ -173,8 +177,10 @@ public class MainActivity extends Activity {
             int firstAngle = angles[angles.length-3];
             int secondAngle = angles[angles.length-2];
             int opt = this.getOptimalAngle(firstRssi, secondRssi, thirdRssi, firstAngle, secondAngle);
+            bestAngleTextView.setText(getString(R.string.best_angle, (int) opt));
             return opt;
         } else{
+            bestAngleTextView.setText(getString(R.string.best_angle_placeholder, 3 - iterCount));
             return -1;
         }
     }
