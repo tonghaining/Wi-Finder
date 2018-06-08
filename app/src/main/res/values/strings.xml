@@ -7,4 +7,5 @@
     <string name="best_angle_placeholder">Optimal angle: need %1$d measurements</string>
     <string name="get_signal_strength">Get signal strength</string>
     <string name="start_iterations">Start 20 iterations</string>
+    <string name="runBtn">Run</string>
 </resources>

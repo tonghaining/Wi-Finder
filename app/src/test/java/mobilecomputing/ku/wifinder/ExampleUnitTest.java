@@ -140,7 +140,6 @@ public class ExampleUnitTest {
     public void testIter(){
         MainActivity activity = new MainActivity();
 
-        activity.init();
         int opt1 = activity.iteration(6, 210);
         Assert.assertEquals(-1, opt1);
 

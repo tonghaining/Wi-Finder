@@ -16,6 +16,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -28,25 +29,17 @@ import java.util.concurrent.Future;
 
 import java.lang.Math;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener {
 
     private static final int NUMBER_OF_ITERATIONS = 3;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    private TextView signalStrengthTextView;
-
-    private TextView signalLevelTextView;
-
-    private Button getSignalStrengthBtn;
-
-    private Button startIterationsBtn;
-
-    private TextView iterationsDataTextView;
-
     private TextView currentAngleTextView;
 
     private TextView bestAngleTextView;
+
+    private Button runButton;
 
     private List<Integer> collectedData = new ArrayList<>();
 
@@ -54,35 +47,19 @@ public class MainActivity extends Activity {
 
     private int iterCount;
 
-    private List<Integer> angleList;
+    private int lastIterationResult;
 
-    private List<Integer> signalList;
+    private List<Integer> angleList = new ArrayList<>();
+
+    private List<Integer> signalList = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        signalStrengthTextView = findViewById(R.id.signal_strength);
-        signalLevelTextView = findViewById(R.id.signal_level);
-        iterationsDataTextView = findViewById(R.id.iterations_data);
-
-        getSignalStrengthBtn = findViewById(R.id.get_signal_strength_btn);
-        getSignalStrengthBtn.setOnClickListener((view) -> {
-            signalStrengthTextView.setText(getText(R.string.signal_strength) + "" + getWiFiStrength());
-            signalLevelTextView.setText(getString(R.string.signal_level, getWifiSignalLevel()));
-        });
-
-        startIterationsBtn = findViewById(R.id.start_iterations);
-        startIterationsBtn.setOnClickListener((view) -> {
-            try {
-                collectedData = collectData();
-            } catch (Exception e) {
-                Log.e(MainActivity.class.toString(), e.toString());
-            }
-
-//            iterationsDataTextView.setText(getIterationsDataString());
-        });
+        runButton = findViewById(R.id.runButton);
+        runButton.setOnClickListener(this);
 
         setupCompass();
 
@@ -109,9 +86,9 @@ public class MainActivity extends Activity {
                 int wifiStrength = getWiFiStrength();
 
                 collectedData.add(wifiStrength);
-                iterationsDataTextView.post(() -> {
-                    iterationsDataTextView.append(wifiStrength + "\n");
-                });
+//                iterationsDataTextView.post(() -> {
+//                    iterationsDataTextView.append(wifiStrength + "\n");
+//                });
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -137,7 +114,7 @@ public class MainActivity extends Activity {
     private void setupCompass() {
         compass = new Compass(this);
         compass.setListener((float azimuth) ->
-            currentAngleTextView.setText(getString(R.string.current_angle, azimuth))
+                currentAngleTextView.setText(getString(R.string.current_angle, azimuth))
         );
     }
 
@@ -156,14 +133,8 @@ public class MainActivity extends Activity {
         currentAngleTextView = findViewById(R.id.current_angle_textview);
     }
 
-    public void init(){
-        this.iterCount = 0;
-        this.angleList =  new ArrayList<Integer>();
-        this.signalList = new ArrayList<Integer>();
-    }
-
     public int iteration(int signal, Integer angle) {
-        this.iterCount ++;
+        this.iterCount++;
         this.signalList.add(signal);
 
         if (angle == null) {
@@ -174,16 +145,19 @@ public class MainActivity extends Activity {
         if (this.iterCount >= 3) {
             Integer[] angles = new Integer[this.angleList.size()];
             angles = this.angleList.toArray(angles);
+
             Integer[] signals = new Integer[this.signalList.size()];
             signals = this.signalList.toArray(signals);
-            int firstRssi = signals[signals.length-3];
-            int secondRssi = signals[signals.length-2];
-            int thirdRssi = signals[signals.length-1];
-            int firstAngle = angles[angles.length-2];
-            int secondAngle = angles[angles.length-1];
+
+            int firstRssi = signals[signals.length - 3];
+            int secondRssi = signals[signals.length - 2];
+            int thirdRssi = signals[signals.length - 1];
+            int firstAngle = angles[angles.length - 2];
+            int secondAngle = angles[angles.length - 1];
             int opt = this.getOptimalAngle(firstRssi, secondRssi, thirdRssi, firstAngle, secondAngle);
+
             return opt;
-        } else{
+        } else {
             return -1;
         }
     }
@@ -223,7 +197,7 @@ public class MainActivity extends Activity {
         optimalAngle = Math.abs(optimalAngle);
 
         if (isRightTurn) {
-            optimalAngle = - optimalAngle;
+            optimalAngle = -optimalAngle;
         }
 
         // map back the secondAngleMapped to the initial position
@@ -238,7 +212,7 @@ public class MainActivity extends Activity {
         if (isRightTurn) {
             return getRightTransposeAngle(AD, AB);
         }
-        return  getLeftTransposeAngle(AD, AB);
+        return getLeftTransposeAngle(AD, AB);
     }
 
     private int getLeftTransposeAngle(double AD, double AB) {
@@ -260,5 +234,25 @@ public class MainActivity extends Activity {
             transposeAngle = AB >= 0 ? 90 : 180;
         }
         return transposeAngle;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (iterCount == 0) {
+            iteration(getWifiSignalLevel(), (int) compass.getAzimuth());
+
+        } else if (iterCount == 1) {
+            iteration(getWifiSignalLevel(), null);
+
+        } else if (iterCount == 2) {
+            lastIterationResult = iteration(getWifiSignalLevel(), (int) compass.getAzimuth());
+
+        } else if (iterCount > 2) {
+
+            lastIterationResult = iteration(getWifiSignalLevel(), lastIterationResult);
+
+        }
+
+        bestAngleTextView.setText("Optimal angle: " + lastIterationResult);
     }
 }
