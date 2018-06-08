@@ -39,6 +39,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private TextView bestAngleTextView;
 
+    private TextView signalStrengthTextView;
+
     private Button runButton;
 
     private List<Integer> collectedData = new ArrayList<>();
@@ -58,6 +60,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        signalStrengthTextView = findViewById(R.id.signal_strength);
         runButton = findViewById(R.id.runButton);
         runButton.setOnClickListener(this);
 
@@ -238,21 +241,24 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+        int wifiStrength = getWiFiStrength();
+
         if (iterCount == 0) {
-            iteration(getWifiSignalLevel(), (int) compass.getAzimuth());
+            iteration(wifiStrength, (int) compass.getAzimuth());
 
         } else if (iterCount == 1) {
-            iteration(getWifiSignalLevel(), null);
+            iteration(wifiStrength, null);
 
         } else if (iterCount == 2) {
-            lastIterationResult = iteration(getWifiSignalLevel(), (int) compass.getAzimuth());
+            lastIterationResult = iteration(wifiStrength, (int) compass.getAzimuth());
 
         } else if (iterCount > 2) {
 
-            lastIterationResult = iteration(getWifiSignalLevel(), lastIterationResult);
+            lastIterationResult = iteration(wifiStrength, lastIterationResult);
 
         }
 
+        signalStrengthTextView.setText(getString(R.string.signal_strength) + wifiStrength);
         bestAngleTextView.setText("Optimal angle: " + lastIterationResult);
     }
 }

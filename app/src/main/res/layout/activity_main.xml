@@ -8,11 +8,11 @@
     android:padding="15dp"
     tools:context=".MainActivity">
 
-    <!--<TextView-->
-        <!--android:id="@+id/signal_strength"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/signal_strength" />-->
+    <TextView
+        android:id="@+id/signal_strength"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/signal_strength" />
 
     <!--<TextView-->
         <!--android:id="@+id/signal_level"-->
