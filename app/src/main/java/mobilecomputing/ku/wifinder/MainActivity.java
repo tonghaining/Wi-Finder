@@ -31,7 +31,7 @@ import java.lang.Math;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
-    private static final int NUMBER_OF_ITERATIONS = 3;
+    private static final int NUMBER_OF_ITERATIONS = 8;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -80,9 +80,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         return WifiManager.calculateSignalLevel(rssi, 5);
     }
 
-    private List<Integer> collectData() throws ExecutionException, InterruptedException {
 
-        Future<List<Integer>> futureData = executorService.submit(() -> {
+    private Integer collectData() throws ExecutionException, InterruptedException {
+
+        Future<Integer> futureData = executorService.submit(() -> {
             List<Integer> collectedData = new ArrayList<>();
 
             for (int i = 0; i < NUMBER_OF_ITERATIONS; i++) {
@@ -98,10 +99,22 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     e.printStackTrace();
                 }
             }
-            return collectedData;
+
+            return calculateAverage(collectedData);
         });
 
         return futureData.get();
+    }
+
+    private int calculateAverage(List <Integer> list) {
+        Integer sum = 0;
+        if(!list.isEmpty()) {
+            for (Integer item : list) {
+                sum += item;
+            }
+            return (int) (sum.doubleValue() / list.size());
+        }
+        return sum;
     }
 
     private String getIterationsDataString() {
@@ -241,7 +254,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        int wifiStrength = getWiFiStrength();
+        int wifiStrength = 0;
+        try {
+            wifiStrength = collectData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (iterCount == 0) {
             iteration(wifiStrength, (int) compass.getAzimuth());
